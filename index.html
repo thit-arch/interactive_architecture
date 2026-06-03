@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backbase Engagement Banking Platform</title>
+<style>
+:root {
+  --bb-blue:    #003087;
+  --bb-cyan:    #00AEEF;
+  --bb-dark:    #001A4D;
+  --bb-green:   #00A859;
+  --bb-amber:   #D97706;
+  --bb-purple:  #7C3AED;
+  --bg:         #080E1C;
+  --surface:    #0F1929;
+  --surface2:   #172032;
+  --border:     #1A3050;
+  --text:       #E2E8F0;
+  --text-dim:   #64748B;
+  --text-mid:   #94A3B8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ──────────────────────────────── */
+header {
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #001030 0%, #002060 100%);
+  border-bottom: 1px solid rgba(0,174,239,0.3);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: var(--bb-cyan);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 16px; color: #001030;
+  letter-spacing: -1px;
+}
+.logo-name { font-size: 15px; font-weight: 700; color: #fff; }
+.logo-sub  { font-size: 10px; color: rgba(0,174,239,0.8); letter-spacing: 0.8px; text-transform: uppercase; }
+
+.scenarios {
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+.sc-btn {
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-mid);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all .18s;
+}
+.sc-btn:hover  { border-color: var(--bb-cyan); color: var(--bb-cyan); }
+.sc-btn.active { background: var(--bb-cyan); border-color: var(--bb-cyan); color: #001030; font-weight: 700; }
+
+/* ── Body split ──────────────────────────── */
+.body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── Canvas ──────────────────────────────── */
+.canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse 80% 60% at 40% 30%, #0A1E40 0%, var(--bg) 100%);
+}
+
+svg#arch {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Sidebar — right panel stacks mock (top) + steps (bottom) ── */
+.sidebar {
+  width: 360px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Mobile mock zone — top of sidebar */
+.sb-mock-zone {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #080E1C;
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0 8px;
+  position: relative;
+  /* Height controlled by JS class */
+}
+.sb-mock-zone.has-mock { height: 42%; }
+.sb-mock-zone.no-mock  { height: 0; display: none; }
+
+/* Steps zone — bottom of sidebar */
+.sb-steps-zone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.sb-head {
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  flex-shrink: 0;
+}
+.sb-head h3 {
+  font-size: 12px; font-weight: 700;
+  color: var(--bb-cyan);
+  text-transform: uppercase; letter-spacing: .5px;
+  margin-bottom: 2px;
+}
+.sb-head p { font-size: 10px; color: var(--text-dim); line-height: 1.4; }
+
+.steps-list { flex: 1; overflow-y: auto; padding: 8px; }
+.steps-list::-webkit-scrollbar { width: 3px; }
+.steps-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.step {
+  display: flex; gap: 8px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  margin-bottom: 4px;
+  opacity: .3;
+  transition: all .25s;
+  cursor: default;
+}
+.step.done   { opacity: .6; border-color: var(--border); background: rgba(0,168,89,.04); }
+.step.active { opacity: 1;  border-color: var(--bb-cyan); background: rgba(0,174,239,.06); }
+
+.snum {
+  width: 19px; height: 19px; border-radius: 50%;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: var(--text-dim);
+  transition: all .25s;
+}
+.step.active .snum { background: var(--bb-cyan); border-color: var(--bb-cyan); color: #001030; }
+.step.done   .snum { background: var(--bb-green); border-color: var(--bb-green); color: #fff; }
+
+.step-body h4  { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 1px; }
+.step-body p   { font-size: 10px; color: var(--text-dim); line-height: 1.4; }
+.step-tag {
+  display: inline-block; margin-top: 3px;
+  padding: 1px 5px; border-radius: 3px;
+  font-size: 8.5px; font-weight: 700; letter-spacing: .3px;
+  background: rgba(0,174,239,.12); color: var(--bb-cyan);
+}
+
+.sb-foot {
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.speed-row {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 7px;
+}
+.speed-row label { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
+.speed-row input  { flex: 1; accent-color: var(--bb-cyan); }
+.speed-row span   { font-size: 10px; color: var(--text-mid); width: 24px; text-align: right; }
+
+.ctrl-row { display: flex; gap: 6px; }
+.btn {
+  flex: 1; padding: 7px; border-radius: 6px;
+  border: none; cursor: pointer; font-size: 11px; font-weight: 600;
+  transition: all .18s;
+}
+.btn-play { background: var(--bb-cyan); color: #001030; }
+.btn-play:hover:not(:disabled) { background: #12C5FF; }
+.btn-play:disabled { opacity: .4; cursor: default; }
+.btn-reset { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.btn-reset:hover { border-color: var(--bb-cyan); color: var(--bb-cyan); }
+
+/* ── Info popup (now hover tooltip, no click needed) ── */
+.info-popup {
+  position: fixed;
+  width: 300px;
+  background: var(--surface);
+  border: 1px solid var(--bb-cyan);
+  border-radius: 10px;
+  padding: 12px 14px 13px;
+  display: none; z-index: 200;
+  box-shadow: 0 8px 32px rgba(0,0,0,.6);
+  pointer-events: none;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(4px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.info-popup.show { display: block; animation: fadeUp .15s ease; }
+.info-popup h4 { font-size: 12px; font-weight: 700; color: var(--bb-cyan); margin-bottom: 5px; }
+.info-popup p  { font-size: 10.5px; color: var(--text-mid); line-height: 1.6; }
+.info-close { display: none; }
+
+/* legend removed */
+
+/* banking overlay removed */
+
+/* ── Mobile UI mock — lives inside sidebar mock zone ── */
+#mobile-mock {
+  width: 180px;
+  height: 100%;
+  background: #F0F4FF;
+  border-radius: 16px;
+  border: 2px solid #334155;
+  box-shadow: 0 4px 20px rgba(0,0,0,.6), inset 0 0 0 1px #475569;
+  overflow: hidden;
+  display: none;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  flex-direction: column;
+}
+#mobile-mock.visible { display: flex; }
+
+.mm-screen { display: none; flex-direction: column; }
+.mm-screen.active { display: flex; }
+
+/* Status bar */
+.mm-bar {
+  background: #fff;
+  height: 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 10px;
+  font-size: 8px; color: #334155; font-weight: 600;
+}
+
+/* Nav bar */
+.mm-nav {
+  background: #fff;
+  padding: 8px 12px 6px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid #E2E8F0;
+}
+.mm-nav-back { color: #1E3A8A; font-size: 14px; line-height: 1; }
+.mm-nav-title { font-size: 11px; font-weight: 700; color: #0F172A; }
+
+/* Payment list item */
+.mm-list-item {
+  background: #fff;
+  margin: 6px 8px 0;
+  border-radius: 10px;
+  padding: 8px 10px;
+  border: 1px solid #E2E8F0;
+  font-size: 9px;
+  cursor: pointer;
+}
+.mm-list-item:hover { border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59,130,246,.15); }
+.mm-li-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+.mm-li-type { color: #64748B; font-size: 8px; display: flex; align-items: center; gap: 3px; }
+.mm-li-status { background: #EEF2FF; color: #3730A3; padding: 1px 5px; border-radius: 4px; font-size: 7.5px; font-weight: 700; }
+.mm-li-name { font-weight: 700; color: #0F172A; font-size: 10px; margin-bottom: 1px; }
+.mm-li-iban { color: #64748B; font-size: 7.5px; font-family: monospace; margin-bottom: 4px; }
+.mm-li-from { background: #F8FAFC; border-left: 2px solid #3B82F6; padding: 2px 5px; border-radius: 0 4px 4px 0; color: #334155; font-size: 7.5px; margin-bottom: 3px; }
+.mm-li-amount { text-align: right; font-weight: 700; color: #0F172A; font-size: 10px; }
+.mm-li-hint { font-size: 7.5px; color: #94A3B8; margin-top: 3px; text-align: center; }
+
+/* Transfer detail screen */
+.mm-detail { background: #F0F4FF; flex: 1; }
+.mm-detail-hero { background: #fff; padding: 8px 12px 10px; text-align: center; border-bottom: 1px solid #E2E8F0; }
+.mm-status-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 7.5px; font-weight: 700; margin-bottom: 4px; }
+.mm-status-entered { background: #EEF2FF; color: #3730A3; }
+.mm-status-approved { background: #DCFCE7; color: #166534; }
+.mm-detail-name { font-size: 10px; font-weight: 700; color: #0F172A; }
+.mm-detail-type { font-size: 8px; color: #64748B; margin-bottom: 3px; }
+.mm-detail-amount { font-size: 20px; font-weight: 800; color: #0F172A; margin: 2px 0; }
+.mm-detail-date { font-size: 7.5px; color: #64748B; }
+
+.mm-card { background: #fff; margin: 5px 8px 0; border-radius: 8px; padding: 7px 10px; border: 1px solid #E2E8F0; font-size: 8px; }
+.mm-card-label { color: #64748B; font-size: 7.5px; margin-bottom: 1px; }
+.mm-card-val { font-weight: 700; color: #0F172A; font-size: 9px; }
+.mm-card-sub { font-family: monospace; color: #64748B; font-size: 7.5px; }
+.mm-card-divider { border: none; border-top: 1px solid #F1F5F9; margin: 5px 0; }
+.mm-approval-row { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 3px; }
+.mm-approval-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 8px; }
+.mm-dot-wait { background: #DBEAFE; color: #1D4ED8; }
+.mm-dot-done { background: #DCFCE7; color: #166534; }
+.mm-approval-text { font-size: 7.5px; color: #334155; line-height: 1.4; }
+.mm-approval-text strong { display: block; font-weight: 700; color: #0F172A; }
+
+/* Action buttons */
+.mm-actions { display: flex; gap: 6px; margin: 6px 8px 8px; }
+.mm-btn { flex: 1; padding: 7px; border-radius: 20px; border: none; font-size: 9px; font-weight: 700; cursor: pointer; transition: all .15s; }
+.mm-btn-reject { background: #DC2626; color: #fff; }
+.mm-btn-reject:hover { background: #B91C1C; }
+.mm-btn-approve { background: #16A34A; color: #fff; }
+.mm-btn-approve:hover { background: #15803D; }
+.mm-btn-done { background: #3B82F6; color: #fff; width: 100%; border-radius: 20px; }
+
+/* Passcode screen */
+.mm-passcode { background: #3B82F6; flex: 1; padding: 10px 8px; display: flex; flex-direction: column; align-items: center; }
+.mm-pc-title { font-size: 12px; font-weight: 800; color: #fff; margin: 6px 0 3px; text-align: center; }
+.mm-pc-sub { font-size: 7.5px; color: rgba(255,255,255,.8); text-align: center; margin-bottom: 10px; }
+.mm-pc-dots { display: flex; gap: 6px; margin-bottom: 10px; }
+.mm-pc-dot { width: 20px; height: 26px; background: rgba(255,255,255,.9); border-radius: 5px; }
+.mm-pc-dot.filled { background: #fff; box-shadow: 0 0 6px rgba(255,255,255,.6); }
+.mm-pc-keypad { display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; width: 100%; }
+.mm-pc-key { background: #fff; border: none; border-radius: 6px; padding: 5px; font-size: 11px; font-weight: 700; color: #0F172A; cursor: pointer; transition: all .1s; }
+.mm-pc-key:hover { background: #DBEAFE; }
+.mm-pc-key.sub { font-size: 7px; color: #64748B; display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+/* Success screen */
+.mm-success { background: #F0F4FF; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; }
+.mm-success-icon { font-size: 36px; margin-bottom: 8px; }
+.mm-success-title { font-size: 13px; font-weight: 800; color: #0F172A; margin-bottom: 3px; }
+.mm-success-sub { font-size: 8px; color: #64748B; text-align: center; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Click-me pulse */
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(59,130,246,.5); }
+  70%  { box-shadow: 0 0 0 6px rgba(59,130,246,0); }
+  100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+}
+.mm-pulse { animation: pulse-ring 1.4s ease infinite; }
+
+/* Step click cursor */
+.step.done, .step.active { cursor: pointer; }
+.step.done:hover, .step.active:hover { border-color: rgba(0,174,239,.5) !important; background: rgba(0,174,239,.04) !important; }
+
+/* SVG node hover */
+.node { cursor: pointer; }
+.node rect, .node path { transition: filter .15s; }
+.node:hover rect,
+.node:hover path { filter: brightness(1.25) drop-shadow(0 0 6px rgba(0,174,239,.5)); }
+.node.hi rect,
+.node.hi path { filter: brightness(1.35) drop-shadow(0 0 10px rgba(0,174,239,.8)); }
+.node.dim rect,
+.node.dim path { opacity: .18; }
+.node.dim text  { opacity: .18; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">BB</div>
+    <div>
+      <div class="logo-name">Backbase</div>
+      <div class="logo-sub">Engagement Banking Platform</div>
+    </div>
+  </div>
+  <div class="scenarios">
+    <button class="sc-btn active" data-sc="login">🔐 Login &amp; View Accounts</button>
+    <button class="sc-btn" data-sc="payment">💸 Make Payment</button>
+  </div>
+</header>
+
+<div class="body">
+  <!-- ── SVG Canvas ── -->
+  <div class="canvas-wrap" id="canvas">
+    <svg id="arch" viewBox="0 0 770 690" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <!-- Arrows -->
+      <marker id="arr"        markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,7 3,0 6" fill="#243858"/></marker>
+      <marker id="arr-cyan"   markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,7 3,0 6" fill="#00AEEF"/></marker>
+      <marker id="arr-gold"   markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,7 3,0 6" fill="#FFD700"/></marker>
+      <marker id="arr-green"  markerWidth="7" markerHeight="6" refX="6" refY="3" orient="auto"><polygon points="0 0,7 3,0 6" fill="#4ADE80"/></marker>
+      <!-- Glow filter -->
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3.5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <!-- Gradients -->
+      <linearGradient id="g-app"   x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#003087"/>
+        <stop offset="100%" stop-color="#0050CC"/>
+      </linearGradient>
+      <linearGradient id="g-found" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#003560"/>
+        <stop offset="100%" stop-color="#004880"/>
+      </linearGradient>
+      <linearGradient id="g-ident" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#1E0060"/>
+        <stop offset="100%" stop-color="#35008A"/>
+      </linearGradient>
+      <linearGradient id="g-bank"  x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#003820"/>
+        <stop offset="100%" stop-color="#005530"/>
+      </linearGradient>
+      <linearGradient id="g-flow"  x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#00303A"/>
+        <stop offset="100%" stop-color="#004D5C"/>
+      </linearGradient>
+      <linearGradient id="g-integ" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#2C1A00"/>
+        <stop offset="100%" stop-color="#4A2E00"/>
+      </linearGradient>
+      <linearGradient id="g-core"  x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#141420"/>
+        <stop offset="100%" stop-color="#222235"/>
+      </linearGradient>
+      <!-- g-authcons removed -->
+    </defs>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- LAYER BANDS                                             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+
+    <!--
+      VERTICAL LAYOUT  (label area = 22px, node padding-top = 10px)
+      ──────────────────────────────────────────────────────────────
+      CLIENT           y=6   h=72   label y=20  nodes start y=16
+      FOUNDATION       y=86  h=78   label y=100 nodes start y=110
+      IDENTITY         y=172 h=252  label y=186 nodes start y=200
+      BANKING/FLOW     y=432 h=96   label y=446 nodes start y=456
+      INTEGRATION      y=536 h=68   label y=550 nodes start y=560
+      CORE             y=612 h=68   label y=626 nodes start y=636
+      ──────────────────────────────────────────────────────────────
+    -->
+
+    <!-- 1 · CLIENT -->
+    <rect x="8" y="6" width="758" height="72" rx="10"
+          fill="rgba(0,48,135,.1)" stroke="#003087" stroke-width="1" stroke-dasharray="5,3"/>
+    <text x="18" y="20" fill="#4A7FC1" font-size="10" font-weight="700" letter-spacing="1.2">CLIENT</text>
+
+    <!-- 2 · FOUNDATION SERVICES -->
+    <rect x="8" y="86" width="758" height="78" rx="10"
+          fill="rgba(0,53,96,.1)" stroke="#0369A1" stroke-width="1" stroke-dasharray="5,3"/>
+    <text x="18" y="100" fill="#38BDF8" font-size="10" font-weight="700" letter-spacing="1.2">FOUNDATION SERVICES</text>
+
+    <!-- 3 · IDENTITY & ENTITLEMENTS -->
+    <rect x="8" y="172" width="758" height="252" rx="10"
+          fill="rgba(30,0,96,.1)" stroke="#6B21A8" stroke-width="1" stroke-dasharray="5,3"/>
+    <text x="18" y="186" fill="#A855F7" font-size="10" font-weight="700" letter-spacing="1.2">IDENTITY &amp; ENTITLEMENTS</text>
+
+    <!-- no sub-zone needed -->
+
+    <!-- 4a · BANKING SERVICES — h=80 (nodes h=48, start y=454, end y=502, band ends y=512) -->
+    <rect x="8" y="432" width="460" height="80" rx="10"
+          fill="rgba(0,56,32,.1)" stroke="#166534" stroke-width="1" stroke-dasharray="5,3"/>
+    <text x="18" y="446" fill="#4ADE80" font-size="10" font-weight="700" letter-spacing="1.2">BANKING SERVICES</text>
+
+    <!-- 4b · FLOW FOUNDATION — same y/h -->
+    <rect x="476" y="432" width="282" height="80" rx="10"
+          fill="rgba(0,77,92,.12)" stroke="#0E7490" stroke-width="1" stroke-dasharray="5,3"/>
+    <text x="486" y="446" fill="#22D3EE" font-size="10" font-weight="700" letter-spacing="1.2">FLOW FOUNDATION</text>
+
+    <!-- 5 · ENTERPRISE INTEGRATION LAYER -->
+    <rect x="8" y="520" width="758" height="68" rx="10"
+          fill="rgba(44,26,0,.15)" stroke="#92400E" stroke-width="1" stroke-dasharray="5,3"/>
+    <text x="18" y="534" fill="#FCD34D" font-size="10" font-weight="700" letter-spacing="1.2">ENTERPRISE INTEGRATION LAYER</text>
+
+    <!-- 6 · CORE BANKING -->
+    <rect x="8" y="596" width="758" height="68" rx="10"
+          fill="rgba(16,16,28,.5)" stroke="#374151" stroke-width="1.5"/>
+    <text x="18" y="610" fill="#64748B" font-size="10" font-weight="700" letter-spacing="1.2">BANK — CORE SYSTEMS</text>
+
+    <!-- Admin / OPS panel removed -->
+
+    <!-- static connections removed — arrows drawn dynamically only -->
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- NODES — name only, subtitle on hover via JS tooltip     -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+
+    <!-- ── CLIENT ────────────────────────────────────────────── -->
+    <g class="node" id="node-app" data-id="app" data-sub="Angular SPA · iOS · Android" transform="translate(275,18)">
+      <rect width="200" height="42" rx="8" fill="url(#g-app)" stroke="#00AEEF" stroke-width="1.5"/>
+      <text x="100" y="26" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Mobile / Web App</text>
+    </g>
+
+    <!-- ── FOUNDATION SERVICES ── -->
+    <g class="node" id="node-edge" data-id="edge" data-sub="Single entry point · Load balancing · Token proxy" transform="translate(20,110)">
+      <rect width="148" height="40" rx="8" fill="url(#g-found)" stroke="#0EA5E9" stroke-width="2"/>
+      <text x="74" y="25" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Edge</text>
+    </g>
+
+    <g class="node" id="node-discovery" data-id="discovery" data-sub="Service registration &amp; load balancing" transform="translate(184,110)">
+      <rect width="138" height="40" rx="8" fill="url(#g-found)" stroke="#0EA5E9" stroke-width="1.5"/>
+      <text x="69" y="25" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Service Registry</text>
+    </g>
+
+    <g class="node" id="node-audit" data-id="audit" data-sub="PSD2 · GDPR · SOX compliance logging" transform="translate(338,110)">
+      <rect width="118" height="40" rx="8" fill="url(#g-found)" stroke="#0EA5E9" stroke-width="1.5"/>
+      <text x="59" y="25" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Audit</text>
+    </g>
+
+    <g class="node" id="node-remoteconfig" data-id="remoteconfig" data-sub="Feature flags · Runtime config · No redeployment" transform="translate(472,110)">
+      <rect width="140" height="40" rx="8" fill="url(#g-found)" stroke="#0EA5E9" stroke-width="1.5"/>
+      <text x="70" y="25" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Remote Config</text>
+    </g>
+
+    <g class="node" id="node-messaging" data-id="messaging" data-sub="Push · SMS · Email · In-App notifications" transform="translate(628,110)">
+      <rect width="130" height="40" rx="8" fill="url(#g-found)" stroke="#0EA5E9" stroke-width="1.5"/>
+      <text x="65" y="25" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Message Delivery</text>
+    </g>
+
+    <!-- ══════════════════════════════════════════════════════════
+         IDENTITY & ENTITLEMENTS — clean 3-column grid
+         Col A (x=20):   Token Converter | Limits | Approvals
+         Col B (x=196):  Auth (tall)     | Self-Enroll | [Access Control spans B+C]
+         Col C (x=522):  Tx Signing | User Lifecycle | User Management
+         Row 1 (y=200): Token / Auth / TxSigning
+         Row 2 (y=268): Impersonation / [Auth continues] / User Lifecycle
+         Row 3 (y=318): Limits / Self-Enroll / User Management
+         Row 4 (y=366): Approvals / Access Control (B+C span)
+    ════════════════════════════════════════════════════════════ -->
+
+    <!-- I&E nodes  (band y=172..424, label y=186, nodes start y=200) -->
+    <!-- Col A Row 1: Token Converter -->
+    <g class="node" id="node-token" data-id="token" data-sub="Converts external JWT to internal JWT — external tokens never reach downstream services" transform="translate(20,200)">
+      <rect width="158" height="40" rx="8" fill="url(#g-ident)" stroke="#9333EA" stroke-width="1.5"/>
+      <text x="79" y="25" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Token Converter</text>
+    </g>
+
+    <!-- Col A Row 2: Impersonation (compact) -->
+    <g class="node" id="node-impersonation" data-id="impersonation" data-sub="Bank employee emulates customer" transform="translate(20,264)">
+      <rect width="158" height="40" rx="8" fill="url(#g-ident)" stroke="#7C3AED" stroke-width="1"/>
+      <text x="79" y="26" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Impersonation</text>
+    </g>
+
+    <!-- Col A Row 3: Limits -->
+    <g class="node" id="node-limits" data-id="limits" data-sub="Restrict payment amounts per user" transform="translate(20,318)">
+      <rect width="158" height="40" rx="8" fill="url(#g-ident)" stroke="#7C3AED" stroke-width="1"/>
+      <text x="79" y="26" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Limits</text>
+    </g>
+
+    <!-- Col A Row 4: Approvals -->
+    <g class="node" id="node-approvals" data-id="approvals" data-sub="Multi-user authorization workflows" transform="translate(20,372)">
+      <rect width="158" height="40" rx="8" fill="url(#g-ident)" stroke="#7C3AED" stroke-width="1"/>
+      <text x="79" y="26" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Approvals</text>
+    </g>
+
+    <!-- Col B: Auth Server — spans rows 1-2 -->
+    <g class="node" id="node-auth" data-id="auth" data-sub="Auth Server (IdP) · FIDO Service (biometrics) · Device Management · Web Authentication · Mobile Authentication · MFA · OTP · SSO · Step-Up · Out-of-band auth · OIDC / OAuth2" transform="translate(196,200)">
+      <rect width="308" height="88" rx="8" fill="url(#g-ident)" stroke="#9333EA" stroke-width="2.5"/>
+      <text x="154" y="26" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">Auth Server</text>
+      <!-- sub-service chips — the only extra info worth showing inline -->
+      <rect x="8"   y="38" width="88" height="24" rx="5" fill="rgba(147,51,234,.2)" stroke="#7C3AED" stroke-width=".8"/>
+      <text x="52"  y="54" text-anchor="middle" fill="#E9D5FF" font-size="8.5" font-weight="600">FIDO Service</text>
+      <rect x="104" y="38" width="96" height="24" rx="5" fill="rgba(147,51,234,.2)" stroke="#7C3AED" stroke-width=".8"/>
+      <text x="152" y="54" text-anchor="middle" fill="#E9D5FF" font-size="8.5" font-weight="600">Device Mgmt</text>
+      <rect x="208" y="38" width="92" height="24" rx="5" fill="rgba(147,51,234,.2)" stroke="#7C3AED" stroke-width=".8"/>
+      <text x="254" y="54" text-anchor="middle" fill="#E9D5FF" font-size="8.5" font-weight="600">Web Auth</text>
+      <rect x="8"   y="68" width="130" height="14" rx="4" fill="rgba(147,51,234,.1)"/>
+      <text x="73"  y="79" text-anchor="middle" fill="#A78BFA" font-size="8">MFA · OTP · SSO · Step-Up</text>
+      <rect x="146" y="68" width="154" height="14" rx="4" fill="rgba(147,51,234,.1)"/>
+      <text x="223" y="79" text-anchor="middle" fill="#A78BFA" font-size="8">Biometric · Out-of-Band</text>
+    </g>
+
+    <!-- Col B Row 3: Self-Enrollment (compact) -->
+    <g class="node" id="node-selfenroll" data-id="selfenroll" data-sub="Existing customers enroll in online banking" transform="translate(196,318)">
+      <rect width="308" height="40" rx="8" fill="url(#g-ident)" stroke="#7C3AED" stroke-width="1"/>
+      <text x="154" y="26" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Self-Enrollment</text>
+    </g>
+
+    <!-- Col C Row 1: Transaction Signing -->
+    <g class="node" id="node-txsigning" data-id="txsigning" data-sub="Customer must authorize &amp; cryptographically sign high-risk transactions — protects against fraud" transform="translate(522,200)">
+      <rect width="222" height="40" rx="8" fill="url(#g-ident)" stroke="#7C3AED" stroke-width="1.5"/>
+      <text x="111" y="25" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Transaction Signing</text>
+    </g>
+
+    <!-- Col C Row 2: User Lifecycle -->
+    <g class="node" id="node-usercycle" data-id="usercycle" data-sub="Provision &amp; migrate users into platform" transform="translate(522,264)">
+      <rect width="222" height="40" rx="8" fill="url(#g-ident)" stroke="#7C3AED" stroke-width="1"/>
+      <text x="111" y="26" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">User Lifecycle</text>
+    </g>
+
+    <!-- Col C Row 3: User Management -->
+    <g class="node" id="node-usermgmt" data-id="usermgmt" data-sub="Profiles · Security · CRM sync" transform="translate(522,318)">
+      <rect width="222" height="40" rx="8" fill="url(#g-ident)" stroke="#7C3AED" stroke-width="1"/>
+      <text x="111" y="26" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">User Management</text>
+    </g>
+
+    <!-- Row 4: Access Control — starts after Approvals (x=186) spans to x=510 -->
+    <g class="node" id="node-access" data-id="access" data-sub="RBAC · Permission evaluation · L2 authority boundary · Arrangement-level entitlements" transform="translate(186,372)">
+      <rect width="322" height="40" rx="8" fill="url(#g-ident)" stroke="#9333EA" stroke-width="2"/>
+      <text x="161" y="25" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Access Control</text>
+    </g>
+
+    <!-- Row 4 Col C: Fraud Detection — 3rd party (x=516 onward) -->
+    <g class="node" id="node-fraud" data-id="fraud" data-sub="3rd Party · Device fingerprint · Behavioural risk scoring · FeedzAI integration" transform="translate(516,372)">
+      <rect width="228" height="40" rx="8" fill="rgba(20,10,0,.6)" stroke="#78350F" stroke-width="1.5" stroke-dasharray="4,2"/>
+      <text x="114" y="16" text-anchor="middle" fill="#D97706" font-size="7.5" font-weight="700" letter-spacing=".6">3RD PARTY</text>
+      <text x="114" y="32" text-anchor="middle" fill="#FCD34D" font-size="13" font-weight="700">Fraud Detection</text>
+    </g>
+
+    <!-- authconsole removed. Fraud Detection moved inside I&E below. -->
+
+    <!-- ── BANKING SERVICES  (band y=432..512, label y=446, nodes y=454, h=48) ── -->
+    <!-- w=106 each, gap=10 → 4×106 + 3×10 = 454. Start x=20. -->
+    <g class="node" id="node-accounts" data-id="accounts" data-sub="Account Statements · Accounts &amp; Transactions · Card Management · Financial Insights" transform="translate(20,458)">
+      <rect width="106" height="36" rx="7" fill="url(#g-bank)" stroke="#16A34A" stroke-width="1.5"/>
+      <text x="53" y="23" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Products</text>
+    </g>
+
+    <g class="node" id="node-payments" data-id="payments" data-sub="Payments · Batches · Forex · Calendar · Positive Pay (add-on)" transform="translate(142,458)">
+      <rect width="106" height="36" rx="7" fill="url(#g-bank)" stroke="#16A34A" stroke-width="1.5"/>
+      <text x="53" y="23" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Payments</text>
+    </g>
+
+    <g class="node" id="node-lending" data-id="lending" data-sub="Accounts &amp; Transactions · Account Statements · Financial Insights · Information Reporting" transform="translate(264,458)">
+      <rect width="106" height="36" rx="7" fill="url(#g-bank)" stroke="#16A34A" stroke-width="1.5"/>
+      <text x="53" y="23" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Transactions</text>
+    </g>
+
+    <g class="node" id="node-engagement" data-id="engagement" data-sub="Contacts · Dashboard · Notifications · Messages · Appointments · Real-Time Communication · Employee" transform="translate(386,458)">
+      <rect width="84" height="36" rx="7" fill="url(#g-bank)" stroke="#16A34A" stroke-width="1.5"/>
+      <text x="42" y="23" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Contacts</text>
+    </g>
+
+    <!-- ── FLOW FOUNDATION ── -->
+    <g class="node" id="node-onboarding" data-id="onboarding" data-sub="BPMN · Interaction Engine · Retail · Business · Card Origination" transform="translate(486,458)">
+      <rect width="125" height="36" rx="7" fill="url(#g-flow)" stroke="#0E7490" stroke-width="1.5"/>
+      <text x="62" y="23" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Digital Onboarding</text>
+    </g>
+
+    <g class="node" id="node-lendingflow" data-id="lendingflow" data-sub="Decision Engine · Personal Loan · SME Origination" transform="translate(624,458)">
+      <rect width="122" height="36" rx="7" fill="url(#g-flow)" stroke="#0E7490" stroke-width="1.5"/>
+      <text x="61" y="23" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Digital Lending</text>
+    </g>
+
+    <!-- ── INTEGRATION LAYER  (band y=520..588, label y=534, nodes y=544) ── -->
+    <g class="node" id="node-inbound" data-id="inbound" data-sub="Core Banking → Platform · async &amp; sync · mTLS-secured" transform="translate(20,544)">
+      <rect width="170" height="36" rx="8" fill="url(#g-integ)" stroke="#D97706" stroke-width="1.5"/>
+      <text x="85" y="23" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Service SDK Connector</text>
+    </g>
+
+    <g class="node" id="node-outbound" data-id="outbound" data-sub="Platform → Core Banking · synchronous REST calls" transform="translate(206,544)">
+      <rect width="170" height="36" rx="8" fill="url(#g-integ)" stroke="#D97706" stroke-width="1.5"/>
+      <text x="85" y="23" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Client SDK Connector</text>
+    </g>
+
+    <g class="node" id="node-direct" data-id="direct" data-sub="Direct service-to-service · mTLS · REST · Event-driven" transform="translate(392,544)">
+      <rect width="148" height="36" rx="8" fill="url(#g-integ)" stroke="#D97706" stroke-width="1.5"/>
+      <text x="74" y="23" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Direct Connector</text>
+    </g>
+
+    <g class="node" id="node-external" data-id="external" data-sub="Entrust · FeedzAI · Mitek · Jack Henry Ensenta" transform="translate(556,544)">
+      <rect width="200" height="36" rx="8" fill="rgba(30,30,50,.8)" stroke="#475569" stroke-width="1.5" stroke-dasharray="4,2"/>
+      <text x="100" y="23" text-anchor="middle" fill="#CBD5E1" font-size="11" font-weight="700">External Integrations</text>
+    </g>
+
+    <!-- ── CORE BANKING ── -->
+    <g class="node" id="node-core" data-id="core" data-sub="System of record · Accounts · Ledger · Transactions" transform="translate(20,620)">
+      <rect width="190" height="36" rx="8" fill="url(#g-core)" stroke="#4B5563" stroke-width="2"/>
+      <text x="95" y="23" text-anchor="middle" fill="#E2E8F0" font-size="13" font-weight="700">Core Banking</text>
+    </g>
+
+    <g class="node" id="node-crm" data-id="crm" data-sub="Customer profile store · CRM integration" transform="translate(225,620)">
+      <rect width="145" height="36" rx="8" fill="url(#g-core)" stroke="#4B5563" stroke-width="1.5"/>
+      <text x="72" y="23" text-anchor="middle" fill="#E2E8F0" font-size="13" font-weight="700">CRM &amp; Data</text>
+    </g>
+
+    <g class="node" id="node-networks" data-id="networks" data-sub="Payment Hub · SWIFT · SEPA · ACH · Domestic rails · Real-time settlement" transform="translate(385,620)">
+      <rect width="368" height="36" rx="8" fill="url(#g-core)" stroke="#4B5563" stroke-width="1.5"/>
+      <text x="184" y="23" text-anchor="middle" fill="#E2E8F0" font-size="13" font-weight="700">Payment Hub</text>
+    </g>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- ANIMATED PATHS & PACKET                                 -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <g id="anim-paths"/>
+
+    </svg>
+
+    <!-- legend removed -->
+
+    <!-- banking overlay removed -->
+
+    <!-- ── Mobile UI Mock — moved to sidebar, see .sb-mock-zone ── -->
+    <!-- placeholder removed from canvas -->
+
+    <!-- Info popup -->
+    <div class="info-popup" id="info-popup">
+      <span class="info-close" id="info-close">×</span>
+      <h4 id="info-title">—</h4>
+      <p id="info-desc">—</p>
+    </div>
+  </div>
+
+  <!-- ── Sidebar ── -->
+  <div class="sidebar">
+
+    <!-- Mobile mock zone (top, payment scenario only) -->
+    <div class="sb-mock-zone no-mock" id="sb-mock-zone">
+      <div id="mobile-mock">
+
+        <!-- LOGIN JOURNEY SCREENS (shared between login and payment scenarios) -->
+
+        <!-- LS0: App splash / signing in -->
+        <div class="mm-screen" id="mm-ls0">
+          <div class="mm-bar"><span>9:41</span><span>▲▲▲</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1E3A8A;padding:12px;gap:8px;">
+            <div style="font-size:26px;">🏦</div>
+            <div style="font-size:12px;font-weight:800;color:#fff;">Digital Banking</div>
+            <div style="font-size:8px;color:rgba(255,255,255,.6);">Connecting…</div>
+            <div style="width:64px;height:3px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden;margin-top:4px;">
+              <div id="login-bar" style="height:100%;background:#60A5FA;border-radius:2px;width:0%;transition:width 1.2s ease;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LS1: Biometric prompt -->
+        <div class="mm-screen" id="mm-ls1">
+          <div class="mm-bar"><span>9:41</span><span>▲▲▲</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;padding:12px;gap:8px;">
+            <div style="width:56px;height:56px;border-radius:50%;background:#EFF6FF;border:2px solid #3B82F6;display:flex;align-items:center;justify-content:center;font-size:28px;">👆</div>
+            <div style="font-size:11px;font-weight:700;color:#0F172A;">Touch ID</div>
+            <div style="font-size:8px;color:#64748B;text-align:center;">Place your finger to authenticate</div>
+            <div style="display:flex;gap:5px;margin-top:4px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#3B82F6;animation:pulse-ring .8s infinite;"></div>
+              <div style="width:8px;height:8px;border-radius:50%;background:#3B82F6;animation:pulse-ring .8s .2s infinite;"></div>
+              <div style="width:8px;height:8px;border-radius:50%;background:#3B82F6;animation:pulse-ring .8s .4s infinite;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LS2: Token / permission check -->
+        <div class="mm-screen" id="mm-ls2">
+          <div class="mm-bar"><span>9:41</span><span>▲▲▲</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;padding:10px;gap:7px;">
+            <div style="font-size:22px;">🔑</div>
+            <div style="font-size:9px;font-weight:700;color:#0F172A;">Checking entitlements…</div>
+            <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:7px;padding:6px 9px;width:100%;font-size:7.5px;color:#1D4ED8;line-height:1.6;">
+              ✓ Identity verified (FIDO)<br/>✓ Role: Retail Customer<br/>✓ Account access granted
+            </div>
+          </div>
+        </div>
+
+        <!-- LS3: Account dashboard with balances -->
+        <div class="mm-screen" id="mm-ls3">
+          <div class="mm-bar"><span>9:41</span><span>▲▲▲</span></div>
+          <!-- App header bar -->
+          <div style="background:#1D4ED8;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:9px;font-weight:700;color:#fff;">Good morning, Alex 👋</div>
+            <div style="font-size:14px;cursor:pointer;">🔔</div>
+          </div>
+          <!-- Accounts list -->
+          <div style="background:#F0F4FF;flex:1;overflow-y:auto;padding:6px;display:flex;flex-direction:column;gap:4px;">
+            <!-- Account card 1 -->
+            <div style="background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:8px 10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                <div style="font-size:8px;color:#64748B;">Checking Account</div>
+                <div style="background:#DCFCE7;color:#166534;font-size:7px;font-weight:700;padding:1px 5px;border-radius:4px;">Active</div>
+              </div>
+              <div style="font-size:7.5px;color:#94A3B8;font-family:monospace;margin-bottom:4px;">•••• •••• 8102</div>
+              <div style="font-size:17px;font-weight:800;color:#0F172A;">$12,480.50</div>
+              <div style="font-size:7px;color:#64748B;margin-top:1px;">Available balance</div>
+            </div>
+            <!-- Account card 2 -->
+            <div style="background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:8px 10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                <div style="font-size:8px;color:#64748B;">Savings Account</div>
+                <div style="background:#DCFCE7;color:#166534;font-size:7px;font-weight:700;padding:1px 5px;border-radius:4px;">Active</div>
+              </div>
+              <div style="font-size:7.5px;color:#94A3B8;font-family:monospace;margin-bottom:4px;">•••• •••• 4417</div>
+              <div style="font-size:17px;font-weight:800;color:#0F172A;">$34,900.00</div>
+              <div style="font-size:7px;color:#64748B;margin-top:1px;">Available balance</div>
+            </div>
+            <!-- Recent transactions header -->
+            <div style="font-size:8px;font-weight:700;color:#334155;padding:2px 2px 0;">Recent Transactions</div>
+            <div style="background:#fff;border-radius:8px;border:1px solid #F1F5F9;padding:5px 8px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:8.5px;font-weight:600;color:#0F172A;">Supermarket</div>
+                <div style="font-size:7px;color:#94A3B8;">Today, 08:12</div>
+              </div>
+              <div style="font-size:9px;font-weight:700;color:#DC2626;">-$43.20</div>
+            </div>
+            <div style="background:#fff;border-radius:8px;border:1px solid #F1F5F9;padding:5px 8px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:8.5px;font-weight:600;color:#0F172A;">Salary</div>
+                <div style="font-size:7px;color:#94A3B8;">Yesterday</div>
+              </div>
+              <div style="font-size:9px;font-weight:700;color:#166534;">+$5,200.00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ PAYMENT JOURNEY SCREENS ══ -->
+
+        <!-- PM-A: Login as Maker gate (waitUser) -->
+        <div class="mm-screen" id="mm-pm-a">
+          <div class="mm-bar"><span>9:41</span><span>▲▲▲</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0F172A;padding:14px;gap:10px;">
+            <div style="font-size:26px;">🏦</div>
+            <div style="font-size:12px;font-weight:800;color:#fff;text-align:center;">Digital Banking</div>
+            <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 10px;width:100%;">
+              <div style="font-size:7px;color:#94A3B8;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">Signing in as</div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:24px;height:24px;border-radius:50%;background:#1D4ED8;display:flex;align-items:center;justify-content:center;font-size:11px;">✍️</div>
+                <div>
+                  <div style="font-size:9px;font-weight:700;color:#fff;">Jane Head</div>
+                  <div style="font-size:7px;color:#60A5FA;">Maker · Business Banking</div>
+                </div>
+              </div>
+            </div>
+            <button class="mm-btn mm-pulse" id="mm-maker-login-btn" style="background:#1D4ED8;color:#fff;font-size:9.5px;padding:9px;border-radius:20px;width:100%;margin-top:2px;">Login as Maker</button>
+          </div>
+        </div>
+
+        <!-- PM-0: Maker signing in (auto) -->
+        <div class="mm-screen" id="mm-pm-0">
+          <div class="mm-bar"><span>9:41</span><span>▲▲▲</span></div>
+          <div style="background:#1D4ED8;padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;">✍️</span>
+            <div style="font-size:7.5px;color:#fff;font-weight:700;">MAKER — Jane Head</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1E3A8A;padding:12px;gap:8px;">
+            <div style="font-size:22px;">🏦</div>
+            <div style="font-size:11px;font-weight:800;color:#fff;">Signing in…</div>
+            <div style="width:60px;height:3px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden;margin-top:4px;">
+              <div id="pay-login-bar" style="height:100%;background:#60A5FA;border-radius:2px;width:0%;transition:width 1.2s ease;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PM-1: Maker Touch ID (auto) -->
+        <div class="mm-screen" id="mm-pm-1">
+          <div class="mm-bar"><span>9:41</span><span>▲▲▲</span></div>
+          <div style="background:#1D4ED8;padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;">✍️</span>
+            <div style="font-size:7.5px;color:#fff;font-weight:700;">MAKER — Jane Head</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;padding:10px;gap:6px;">
+            <div style="font-size:28px;">👆</div>
+            <div style="font-size:10px;font-weight:700;color:#0F172A;">Touch ID</div>
+            <div style="font-size:8px;color:#64748B;text-align:center;">Authenticating…</div>
+            <div style="display:flex;gap:4px;margin-top:4px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#3B82F6;animation:pulse-ring .8s infinite;"></div>
+              <div style="width:8px;height:8px;border-radius:50%;background:#3B82F6;animation:pulse-ring .8s .2s infinite;"></div>
+              <div style="width:8px;height:8px;border-radius:50%;background:#3B82F6;animation:pulse-ring .8s .4s infinite;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PM-2: Maker role/entitlement check (auto) -->
+        <div class="mm-screen" id="mm-pm-2">
+          <div class="mm-bar"><span>9:41</span><span>▲▲▲</span></div>
+          <div style="background:#1D4ED8;padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;">✍️</span>
+            <div style="font-size:7.5px;color:#fff;font-weight:700;">MAKER — Jane Head</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;padding:10px;gap:6px;">
+            <div style="font-size:22px;">🔑</div>
+            <div style="font-size:9px;font-weight:700;color:#0F172A;">Checking permissions…</div>
+            <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:5px 8px;width:100%;font-size:7.5px;color:#1D4ED8;line-height:1.6;">
+              ✓ Role: Business User<br/>✓ Payment initiation rights<br/>✓ Limits applied
+            </div>
+          </div>
+        </div>
+
+        <!-- PM-3: Maker creates payment (waitUser → Submit) -->
+        <div class="mm-screen" id="mm-pm-3">
+          <div class="mm-bar"><span>9:41</span><span>▲▲▲</span></div>
+          <div style="background:#1D4ED8;padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;">✍️</span>
+            <div style="font-size:7.5px;color:#fff;font-weight:700;">MAKER — Jane Head</div>
+          </div>
+          <div class="mm-nav"><span class="mm-nav-back">←</span><span class="mm-nav-title">Payments</span></div>
+          <div style="background:#F8FAFC;flex:1;padding:6px;display:flex;flex-direction:column;gap:4px;overflow:hidden;">
+            <div style="background:#fff;border-radius:8px;border:1px solid #E2E8F0;padding:6px;">
+              <div style="font-size:7.5px;color:#64748B;margin-bottom:2px;">To</div>
+              <div style="font-size:9px;font-weight:600;color:#0F172A;">Dorothy Ellis</div>
+              <div style="font-size:7px;color:#94A3B8;font-family:monospace;">NL71 NOYU 7154 7436 11</div>
+              <hr style="border:none;border-top:1px solid #F1F5F9;margin:4px 0;"/>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                <div style="font-size:7.5px;color:#64748B;">Amount</div>
+                <div style="font-size:10px;font-weight:700;color:#0F172A;">EUR 42,61</div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:2px;">
+                <div style="font-size:7.5px;color:#64748B;">Type</div>
+                <div style="font-size:7.5px;color:#334155;">International Wire</div>
+              </div>
+            </div>
+            <button class="mm-btn mm-btn-approve mm-pulse" id="mm-submit-btn" style="border-radius:8px;font-size:8.5px;padding:8px;">Submit Payment</button>
+          </div>
+        </div>
+
+        <!-- PM-4: Maker Face ID — Transaction Signing (waitUser) -->
+        <div class="mm-screen" id="mm-pm-4">
+          <div class="mm-bar"><span>9:41</span><span>▲▲▲</span></div>
+          <div style="background:#1D4ED8;padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;">✍️</span>
+            <div style="font-size:7.5px;color:#fff;font-weight:700;">MAKER — Transaction Signing</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;padding:10px;gap:7px;">
+            <div style="width:52px;height:52px;border-radius:14px;background:#EFF6FF;border:2px solid #3B82F6;display:flex;align-items:center;justify-content:center;font-size:26px;">😶</div>
+            <div style="font-size:10px;font-weight:700;color:#0F172A;">Face ID</div>
+            <div style="font-size:7.5px;color:#64748B;text-align:center;">Confirm your payment<br/>with Face ID</div>
+            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:6px 8px;width:100%;font-size:7.5px;color:#334155;line-height:1.6;">
+              <span style="color:#64748B;">Sending</span> <strong>EUR 42,61</strong><br/>
+              <span style="color:#64748B;">To</span> Dorothy Ellis
+            </div>
+            <button class="mm-btn mm-pulse" id="mm-maker-sign-btn" style="background:#1D4ED8;color:#fff;font-size:9px;padding:8px;border-radius:20px;width:100%;">Authenticate with Face ID</button>
+          </div>
+        </div>
+
+        <!-- PM-5: Payment submitted — Pending Approval (waitUser → Sign Out) -->
+        <div class="mm-screen" id="mm-pm-5">
+          <div class="mm-bar"><span>9:42</span><span>▲▲▲</span></div>
+          <div style="background:#1D4ED8;padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;">✍️</span>
+            <div style="font-size:7.5px;color:#fff;font-weight:700;">MAKER — Jane Head</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;background:#F8FAFC;padding:8px;gap:5px;overflow:hidden;">
+            <div style="background:#fff;border-radius:10px;border:1px solid #E2E8F0;padding:8px 10px;width:100%;text-align:center;">
+              <div style="font-size:20px;margin-bottom:4px;">📤</div>
+              <div style="display:inline-block;background:#FEF9C3;color:#854D0E;font-size:7.5px;font-weight:700;padding:2px 8px;border-radius:20px;margin-bottom:4px;">Pending Approval</div>
+              <div style="font-size:9px;font-weight:700;color:#0F172A;">EUR 42,61</div>
+              <div style="font-size:7.5px;color:#64748B;">to Dorothy Ellis</div>
+            </div>
+            <div style="background:#fff;border-radius:8px;border:1px solid #E2E8F0;padding:6px 8px;width:100%;font-size:7.5px;color:#334155;line-height:1.7;">
+              <div style="display:flex;justify-content:space-between;"><span style="color:#64748B;">Status</span><span style="color:#D97706;font-weight:700;">Awaiting 1 approver</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:#64748B;">Submitted</span><span>09:42 today</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:#64748B;">Signed by</span><span>Jane Head (SCA ✓)</span></div>
+            </div>
+            <div style="font-size:7.5px;color:#94A3B8;text-align:center;">An approver will be notified<br/>to authorise this payment.</div>
+            <button class="mm-btn mm-pulse" id="mm-signout-btn" style="background:#F1F5F9;color:#334155;border:1px solid #CBD5E1;font-size:8.5px;padding:7px;border-radius:20px;width:100%;margin-top:auto;">Sign Out ↩</button>
+          </div>
+        </div>
+
+        <!-- PM-B: Login as Approver gate (waitUser) -->
+        <div class="mm-screen" id="mm-pm-b">
+          <div class="mm-bar"><span>9:43</span><span>▲▲▲</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0F172A;padding:14px;gap:10px;">
+            <div style="font-size:26px;">🏦</div>
+            <div style="font-size:12px;font-weight:800;color:#fff;text-align:center;">Digital Banking</div>
+            <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 10px;width:100%;">
+              <div style="font-size:7px;color:#94A3B8;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">Signing in as</div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:24px;height:24px;border-radius:50%;background:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:11px;">👔</div>
+                <div>
+                  <div style="font-size:9px;font-weight:700;color:#fff;">Kristel Jewel</div>
+                  <div style="font-size:7px;color:#A78BFA;">Approver · Business Banking</div>
+                </div>
+              </div>
+            </div>
+            <button class="mm-btn mm-pulse" id="mm-appr-login-btn" style="background:#7C3AED;color:#fff;font-size:9.5px;padding:9px;border-radius:20px;width:100%;margin-top:2px;">Login as Approver</button>
+          </div>
+        </div>
+
+        <!-- PM-6: Approver signing in (auto) -->
+        <div class="mm-screen" id="mm-pm-6">
+          <div class="mm-bar"><span>9:43</span><span>▲▲▲</span></div>
+          <div style="background:#7C3AED;padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;">👔</span>
+            <div style="font-size:7.5px;color:#fff;font-weight:700;">APPROVER — Kristel Jewel</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1E3A8A;padding:10px;gap:7px;">
+            <div style="font-size:20px;">🏦</div>
+            <div style="font-size:10px;font-weight:800;color:#fff;">Signing in…</div>
+            <div style="width:60px;height:3px;background:rgba(255,255,255,.2);border-radius:2px;overflow:hidden;">
+              <div id="appr-bar" style="height:100%;background:#A78BFA;border-radius:2px;width:0%;transition:width 1.2s ease;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PM-7: Approver biometric + role check (auto) -->
+        <div class="mm-screen" id="mm-pm-7">
+          <div class="mm-bar"><span>9:43</span><span>▲▲▲</span></div>
+          <div style="background:#7C3AED;padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;">👔</span>
+            <div style="font-size:7.5px;color:#fff;font-weight:700;">APPROVER — Kristel Jewel</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;padding:10px;gap:5px;">
+            <div style="font-size:22px;">👆</div>
+            <div style="font-size:9px;font-weight:700;color:#0F172A;">Biometric verified</div>
+            <div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:6px;padding:5px 8px;width:100%;font-size:7.5px;color:#6D28D9;line-height:1.6;">
+              ✓ Role: Authorised Approver<br/>✓ Approval rights active<br/>✓ Policy: 1 of 2 required
+            </div>
+          </div>
+        </div>
+
+        <!-- PM-8: Approver sees pending payment (waitUser → Approve) -->
+        <div class="mm-screen" id="mm-pm-8">
+          <div class="mm-bar"><span>9:43</span><span>▲▲▲</span></div>
+          <div style="background:#7C3AED;padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;">👔</span>
+            <div style="font-size:7.5px;color:#fff;font-weight:700;">APPROVER — Kristel Jewel</div>
+          </div>
+          <div class="mm-nav" style="padding:5px 8px;"><span class="mm-nav-title">Pending Approval</span></div>
+          <div style="background:#F8FAFC;flex:1;padding:5px;display:flex;flex-direction:column;gap:4px;overflow:hidden;">
+            <div style="text-align:center;padding:3px 0;">
+              <span class="mm-status-badge mm-status-entered">Entered</span>
+              <div style="font-size:9px;font-weight:700;color:#0F172A;margin-top:2px;">Dorothy Ellis · International</div>
+              <div style="font-size:15px;font-weight:800;color:#0F172A;margin:1px 0;">EUR 42,61</div>
+            </div>
+            <div class="mm-card" style="font-size:7.5px;">
+              <div style="color:#64748B;">From</div>
+              <div style="font-weight:700;color:#0F172A;">Checking USD 8102</div>
+              <hr class="mm-card-divider"/>
+              <div style="color:#64748B;">Submitted by</div>
+              <div style="font-weight:600;color:#334155;">Jane Head (SCA ✓)</div>
+            </div>
+            <div class="mm-actions" style="margin:0;">
+              <button class="mm-btn mm-btn-reject" style="font-size:8px;">Reject</button>
+              <button class="mm-btn mm-btn-approve mm-pulse" id="mm-approve-btn" style="font-size:8px;">Approve</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PM-9: Approver Face ID — Transaction Signing (waitUser) -->
+        <div class="mm-screen" id="mm-pm-9">
+          <div class="mm-bar"><span>9:43</span><span>▲▲▲</span></div>
+          <div style="background:#7C3AED;padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;">👔</span>
+            <div style="font-size:7.5px;color:#fff;font-weight:700;">APPROVER — Transaction Signing</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;padding:10px;gap:7px;">
+            <div style="width:52px;height:52px;border-radius:14px;background:#F5F3FF;border:2px solid #7C3AED;display:flex;align-items:center;justify-content:center;font-size:26px;">😶</div>
+            <div style="font-size:10px;font-weight:700;color:#0F172A;">Face ID</div>
+            <div style="font-size:7.5px;color:#64748B;text-align:center;">Authorise this payment<br/>with Face ID</div>
+            <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:6px 8px;width:100%;font-size:7.5px;color:#334155;line-height:1.6;">
+              <span style="color:#64748B;">Approving</span> <strong>EUR 42,61</strong><br/>
+              <span style="color:#64748B;">To</span> Dorothy Ellis
+            </div>
+            <button class="mm-btn mm-pulse" id="mm-sign-btn" style="background:#7C3AED;color:#fff;font-size:9px;padding:8px;border-radius:20px;width:100%;">Authenticate with Face ID</button>
+          </div>
+        </div>
+
+        <!-- PM-10: Processing (auto) -->
+        <div class="mm-screen" id="mm-pm-10">
+          <div class="mm-bar"><span>9:43</span><span>▲▲▲</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;padding:12px;gap:8px;">
+            <div style="font-size:22px;animation:spin 1.5s linear infinite;display:inline-block;">⚙️</div>
+            <div style="font-size:10px;font-weight:700;color:#0F172A;">Processing Payment</div>
+            <div style="font-size:7.5px;color:#64748B;text-align:center;">Core Banking processing<br/>Routing to SWIFT network…</div>
+            <div style="width:80%;height:4px;background:#F1F5F9;border-radius:2px;overflow:hidden;">
+              <div id="proc-bar" style="height:100%;background:#3B82F6;border-radius:2px;width:0%;transition:width 1.5s ease;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PM-11: Success + notification (auto) -->
+        <div class="mm-screen" id="mm-pm-11">
+          <div class="mm-bar"><span>9:43</span><span>▲▲▲</span></div>
+          <div id="mm-notif" style="background:#1E293B;margin:4px;border-radius:8px;padding:5px 8px;display:flex;align-items:flex-start;gap:5px;opacity:0;transition:opacity .5s;">
+            <span style="font-size:11px;">🏦</span>
+            <div>
+              <div style="font-size:7.5px;font-weight:700;color:#fff;">Digital Banking</div>
+              <div style="font-size:7px;color:#94A3B8;">Payment approved · EUR 42,61 sent</div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#F0FDF4;padding:10px;gap:5px;">
+            <div style="font-size:26px;">✅</div>
+            <div style="font-size:11px;font-weight:800;color:#0F172A;">Transfer Approved</div>
+            <div style="font-size:7.5px;color:#166534;text-align:center;">Routed via Payment Hub<br/>for settlement</div>
+            <button class="mm-btn mm-btn-done" style="margin-top:8px;font-size:8.5px;padding:6px;" id="mm-done-btn">Done</button>
+          </div>
+        </div>
+
+      </div><!-- /#mobile-mock -->
+      <!-- Action reminder lives here, below the phone -->
+      <div id="user-hint" style="display:none;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.35);border-radius:7px;padding:5px 10px;font-size:10px;color:#93C5FD;margin:6px 8px 2px;text-align:center;"></div>
+    </div><!-- /.sb-mock-zone -->
+
+    <!-- Steps zone (bottom) -->
+    <div class="sb-steps-zone">
+      <div class="sb-head">
+        <h3 id="sc-title">User Login</h3>
+        <p id="sc-desc">Click ▶ Play — arrows appear only as each step activates. Click any component for details.</p>
+      </div>
+      <div class="steps-list" id="steps-list"></div>
+      <div class="sb-foot">
+        <div class="speed-row">
+          <label>Speed</label>
+          <input type="range" id="speed" min="0.5" max="3" step="0.5" value="1"/>
+          <span id="speed-lbl">1×</span>
+        </div>
+        <div class="ctrl-row">
+          <button class="btn btn-play" id="btn-play">▶ Play</button>
+          <button class="btn btn-reset" id="btn-reset">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Component metadata ────────────────────────────────────────────────────
+const COMPS = {
+  app:         { title:"Mobile / Web App",          desc:"Backbase provides ready-to-go banking apps built from configurable journeys. Available as Angular SPA (web), iOS, and Android. Apps include Digital Banking, Digital Onboarding, Digital Lending, Digital Engage, and Digital Assist. Each app is themed to the bank's brand and guides users through step-by-step journeys." },
+  edge:        { title:"Edge (API Gateway)",         desc:"The single entry point to the entire platform. Edge receives ALL client requests, load-balances and routes them to the correct downstream service, and invokes the Identity Token Converter to swap external tokens for internal ones before proxying requests onward. Nothing reaches backend services without passing through Edge." },
+  discovery:   { title:"Service Registry",           desc:"Enables service registration and discovery for inter-service communication and load balancing. All Backbase microservices register here so Edge and peer services can dynamically locate them." },
+  audit:       { title:"Audit",                      desc:"Comprehensive log of all business and system activity — 'who did what and when'. Every user action and lifecycle event is captured. Supports regulatory compliance: PSD2, Sarbanes-Oxley, GDPR. Required by law in most banking jurisdictions." },
+  remoteconfig:{ title:"Remote Config & Provisioning",desc:"Manages feature flags, runtime configuration, and version control for web and mobile apps — all without app redeployment. Provisioning releases content updates and engagements via CLI and API, enabling banks to push changes instantly." },
+  messaging:   { title:"Message Delivery",           desc:"Sends messages across all channels: push notifications, in-app, message centre, SMS, and email. Supports individual and bulk delivery, priority queuing, and spike handling. Underpins the Engagements capability which orchestrates the overall lifecycle of customer communications." },
+  token:       { title:"Identity Token Converter",   desc:"Converts the external JWT token (issued by Auth Server to the client app) into the internal JWT format required by all downstream services. This boundary enforces a strict trusted-zone separation: external tokens never reach Banking Services or other backend capabilities." },
+  auth:        { title:"Auth Server & Authentication Services", desc:"The Auth Server acts as the Identity Provider (IdP), defines authentication flows, and issues external JWT access tokens (OIDC/OAuth2). It works together with: FIDO Service — provides Strong Customer Authentication (SCA) using FIDO UAF for biometrics and passcodes on mobile; Device Management Service — registers and manages trusted devices for mobile SSO and out-of-band authentication; Web Authentication Service — handles web MFA and OTPs; Mobile Authentication Service — enables inband biometric auth, out-of-band web login verification, and mobile SSO. Together they support: biometric login (fingerprint/Face ID via Secure Enclave), out-of-band web authentication (confirm web login on mobile device), mobile SSO across OIDC-enabled apps, MFA/OTP, Step-Up Authentication before high-risk actions, and forgotten password/username recovery." },
+  txsigning:   { title:"Transaction Signing",        desc:"Requires the customer to explicitly authorise and cryptographically sign a transaction before it is carried out. Protects high-risk transactions (e.g. large payments, beneficiary changes) against fraud and man-in-the-browser attacks. Triggers Step-Up Authentication when needed." },
+  impersonation:{ title:"Impersonation",             desc:"Allows a bank employee (e.g. call centre agent) to emulate a specific customer's session in the web app and perform a predefined, audited set of actions on their behalf — for assisted servicing. Full audit trail is maintained." },
+  selfenroll:  { title:"Self-Enrollment",            desc:"Enables existing bank customers to enrol themselves in online/mobile banking with minimal intervention from bank employees. Guides users through credential setup, MFA enrolment, and initial access configuration." },
+  usercycle:   { title:"User Lifecycle",             desc:"Provisions and migrates users into the Engagement Banking Platform — ensuring correct entitlements and login access from day one. Handles bulk user migration from legacy systems and the provisioning of newly onboarded customers from the Core Banking system." },
+  limits:      { title:"Limits",                     desc:"Restricts the payments that a bank customer can create or approve — capping amounts per transaction, per day, or per payment type. Lowers risk for the bank and its customers. Configurable per user, user group, or product." },
+  approvals:   { title:"Approvals",                  desc:"Creates multi-user approval workflows for creating, updating, and deleting resources (payments, contacts, user changes). Used heavily in business banking where payments above a threshold require dual authorisation. Configurable workflow rules and escalation paths." },
+  usermgmt:    { title:"User Management",            desc:"Covers employee management of user details and account security — password resets, credential management, and account lock/unlock. Integrates with Core Banking and CRM for customer profile management. Supports self-service credential updates by end users." },
+  access:      { title:"Access Control",             desc:"The central entitlements engine. Controls which resources a user can access and what actions they can perform, based on their identity and assigned permissions. Enforces decisions within the L2 authority boundary. Evaluated on every request by downstream Banking Services. Supports RBAC, arrangement-level permissions, and legal entity hierarchies." },
+  authconsole: { title:"Auth Server Admin Console",  desc:"A dedicated web console for bank administrators to configure authentication realms, define authentication flows, manage clients and scopes, and set up MFA policies — all without requiring code changes or redeployments. Built on Keycloak's admin interface." },
+  fraud:       { title:"Fraud Detection",            desc:"Detects and prevents fraudulent activities through device identification, behavioural analytics, and risk scoring. Integrates with third-party risk engines (FeedzAI by default). Feeds risk signals into the trust evaluation chain that drives authentication and step-up decisions." },
+  accounts:    { title:"Accounts & Transactions",    desc:"Provides customers with their accounts, balances, and transaction history. Includes: Account Statements (view/download), External Account Aggregation (multi-bank), Card Management, Credit Cards, Certificates of Deposit, Deposit Account Management, and Financial Insights (spending analysis, budgeting)." },
+  payments:    { title:"Payments & Treasury",        desc:"Enables money transfers between accounts. Includes Batch Payments (multiple payments at once), Direct Debits, Forex (spot rates, cross-currency payments), Scheduler (recurring/timed payments), Calendar (business days), and Positive Pay (fraud prevention for checks and ACH)." },
+  lending:     { title:"Loans, Credit & Wealth",     desc:"Enables customers to manage loans, view real-time credit scores, full credit reports, and credit score simulators. Information Reporting provides exportable reports for business banking customers to track account activity and manage cash flow." },
+  engagement:  { title:"Customer Engagement & Service", desc:"Dashboard (configurable account overview), Contacts (payment beneficiaries), Notifications, Secure Messaging, Appointments (branch booking), Bill Pay (US), Direct Deposit Switch, Remote Deposit Capture, Real-Time Communication (live chat), Family Banking, and Digital Assist (employee servicing tools)." },
+  onboarding:  { title:"Digital Onboarding Flow",   desc:"A Flow Foundation microservice orchestrating new customer onboarding end-to-end. Uses BPMN process automation, the Interaction Engine (frontend journey steps), and Decision Management. Reference flows: Retail Account Opening, Business Onboarding, and Credit Card Origination. Integrates with KYC, AML, eSignature, and document capture." },
+  lendingflow: { title:"Digital Lending Flow",       desc:"A Flow Foundation microservice for loan origination. Orchestrates BPMN processes for: application intake, credit scoring, decision management, document collection, eSignature, and disbursement. Reference flows: Personal Loan and SME (Small Business) Loan Origination." },
+  inbound:     { title:"Inbound Integration — Service SDK", desc:"Enables Core Banking systems to push data into the Engagement Banking Platform. The Core Banking system calls the Platform's Integration API (mTLS-secured). Supports both synchronous (request/response) and asynchronous (event-driven via message broker) patterns. Used for transaction import, balance sync, and event notifications." },
+  outbound:    { title:"Outbound Integration — Client SDK", desc:"Enables the Platform to call Core Banking APIs synchronously to retrieve real-time data or execute operations. The Client SDK Connector translates the Platform's canonical model to the Core Banking system's API format. Used for payment execution, real-time balance retrieval, and product queries." },
+  direct:      { title:"Direct Connector",           desc:"For integrations requiring the lowest latency — direct service-to-service calls secured with mTLS. Supports REST APIs and event-driven messaging. Used for time-critical operations such as payment execution and real-time balance checks in high-performance scenarios." },
+  external:    { title:"Third-Party Integrations",   desc:"External services embedded in platform flows: Entrust (PKI / eSignature), FeedzAI (real-time fraud and risk scoring), Mitek MiSnap (OCR and document image capture for ID verification), Jack Henry Ensenta (remote check deposit processing), and other specialised banking service providers." },
+  core:        { title:"Core Banking System",        desc:"The bank's system of record — manages accounts, ledger balances, and transactions. The Engagement Banking Platform is the engagement and orchestration layer sitting above Core Banking, without replacing it. Core Banking is the authoritative source of truth for all financial data." },
+  crm:         { title:"CRM & Customer Data",        desc:"Customer Relationship Management system and customer data stores. The Platform's Customer Profile capability keeps customer profile data synchronised bidirectionally with these systems to ensure a consistent, up-to-date view of the customer across all channels." },
+  networks:    { title:"Payment Hub", desc:"The Payment Hub aggregates and routes payment instructions to the appropriate settlement rail: SWIFT (international wires), SEPA (European credit transfers and direct debits), ACH (US automated clearing house), and domestic real-time payment schemes. Core Banking submits instructions here; the hub handles rail selection, formatting, and settlement confirmation back to the platform." }
+};
+
+// ── Node centre positions (SVG viewBox coords) ───────────────────────────
+const POS = {
+  app:          { x:375,  y:42  },  // translate(275,16) + w/2=100
+  edge:         { x:94,   y:134 },  // translate(20,110) + w/2=74
+  discovery:    { x:253,  y:134 },  // translate(184,110) + 69
+  audit:        { x:397,  y:134 },  // translate(338,110) + 59
+  remoteconfig: { x:542,  y:134 },  // translate(472,110) + 70
+  messaging:    { x:693,  y:134 },  // translate(628,110) + 65
+  token:        { x:99,   y:225 },  // translate(20,200) + 79
+  impersonation:{ x:99,   y:284 },  // translate(20,264) + 79
+  limits:       { x:99,   y:338 },  // translate(20,318) + 79
+  approvals:    { x:99,   y:392 },  // translate(20,372) + 79
+  auth:         { x:350,  y:250 },  // translate(196,200) + 154
+  selfenroll:   { x:350,  y:338 },  // translate(196,318) + 154
+  txsigning:    { x:633,  y:225 },  // translate(522,200) + 111
+  usercycle:    { x:633,  y:284 },  // translate(522,264) + 111
+  usermgmt:     { x:633,  y:338 },  // translate(522,318) + 111
+  access:       { x:347,  y:392 },  // translate(186,372) + 161
+  fraud:        { x:630,  y:392 },  // translate(516,372) + 114
+  accounts:     { x:73,   y:478 },  // translate(20,454)  + 53, h/2=24
+  payments:     { x:195,  y:478 },  // translate(142,454) + 53
+  lending:      { x:317,  y:478 },  // translate(264,454) + 53
+  engagement:   { x:428,  y:478 },  // translate(386,454) + 42
+  onboarding:   { x:548,  y:478 },  // translate(486,454) + 62
+  lendingflow:  { x:685,  y:478 },  // translate(624,454) + 61
+  inbound:      { x:105,  y:563 },  // translate(20,544)  + 85
+  outbound:     { x:291,  y:563 },  // translate(206,544) + 85
+  direct:       { x:466,  y:563 },  // translate(392,544) + 74
+  external:     { x:656,  y:563 },  // translate(556,544) + 100
+  core:         { x:115,  y:639 },  // translate(20,620)  + 95
+  crm:          { x:297,  y:639 },  // translate(225,620) + 72
+  networks:     { x:569,  y:639 }   // translate(385,620) + 184
+};
+
+// ── Scenarios ─────────────────────────────────────────────────────────────
+const SCENARIOS = {
+  login: {
+    title: "Login & View Accounts",
+    desc:  "Biometric login via FIDO → JWT issued → Edge token conversion → Access Control → Accounts fetched from Core Banking → balance displayed",
+    mock:  true,
+    steps: [
+      { from:"app",      to:"edge",     title:"App connects — request enters Edge",     desc:"User opens the mobile app. Every request starts at Edge — the single ingress point. Edge load-balances, rate-limits, and routes the request. Nothing reaches backend services without passing through it.",                                                                 tag:"HTTPS · Edge",       lsScreen:0 },
+      { from:"edge",     to:"discovery",title:"Edge resolves service via Service Registry", desc:"Edge consults the Service Registry to locate the Auth Server instance. All Backbase microservices register here so Edge can dynamically discover and load-balance across them.",                                                                                       tag:"Service Discovery",  lsScreen:0 },
+      { from:"app",      to:"auth",     title:"Auth Server initiates biometric login",  desc:"Edge routes the OIDC authorization request to the Auth Server. On a registered device, the FIDO UAF biometric flow (fingerprint / Face ID) is offered. The Auth Server coordinates with FIDO Service and Device Management.", tag:"OIDC / OAuth2",      lsScreen:0 },
+      { from:"auth",     to:"fraud",    title:"Device & risk scoring",                  desc:"Device Management verifies the device is registered and trusted. Fraud Detection evaluates the device fingerprint and behavioural risk score. If risk is elevated, Step-Up Authentication is triggered.",                                                                   tag:"FIDO · Risk Check",  lsScreen:1 },
+      { from:"fraud",    to:"auth",     title:"Biometric challenge signed by device",   desc:"The FIDO Service generates a UAF authentication challenge and sends it to the device. The user presents their biometric — the Secure Enclave signs the challenge with the stored private key and returns the signed assertion.",                                            tag:"UAF Challenge",      lsScreen:1 },
+      { from:"auth",     to:"app",      title:"Auth Server issues external JWT",        desc:"Auth Server validates the FIDO signature and issues an OIDC access token (external JWT) containing identity and scope claims. A refresh token is also issued for session continuity.",                                                                                      tag:"External JWT",       lsScreen:1 },
+      { from:"app",      to:"edge",     title:"Authenticated request through Edge",     desc:"The app sends GET /accounts with the external JWT in the Authorization header. Edge is the single ingress — no backend service is reachable without passing through it.",                                                                                                  tag:"HTTPS · Bearer",     lsScreen:2 },
+      { from:"edge",     to:"token",    title:"Token converted to internal format",     desc:"Edge invokes the Identity Token Converter. The external JWT is exchanged for an internal JWT. Downstream services — including Accounts — only ever see the internal token. External tokens never cross the trusted-zone boundary.",                                        tag:"Token Conversion",   lsScreen:2 },
+      { from:"token",    to:"access",   title:"Access Control evaluates entitlements",  desc:"Access Control receives the internal JWT and evaluates which accounts and at what detail level the user is entitled to see — applying RBAC rules and arrangement-level permissions.",                                                                                       tag:"RBAC · Entitlements",lsScreen:2 },
+      { from:"access",   to:"accounts", title:"Accounts service builds response",       desc:"The Accounts capability reads from its local data store (pre-synced from Core Banking) and builds the account summary — balances, product types, and account metadata.",                                                                                                   tag:"Account Query",      lsScreen:2 },
+      { from:"accounts", to:"inbound",  title:"Real-time balance fetch from Core",      desc:"For live balances, the Inbound (Service SDK) connector requests the current balance from Core Banking and updates the platform cache with the authoritative figure.",                                                                                                       tag:"Balance Sync",       lsScreen:2 },
+      { from:"inbound",  to:"core",     title:"Core Banking returns balance",           desc:"Core Banking returns the authoritative real-time balance and latest transactions from the system of record.",                                                                                                                                                               tag:"Source of Truth",    lsScreen:2 },
+      { from:"core",     to:"accounts", title:"Data aggregated in Accounts service",    desc:"The live balance is merged with cached transaction history and account metadata, forming the complete account view.",                                                                                                                                                       tag:"Data Aggregation",   lsScreen:3 },
+      { from:"accounts", to:"app",      title:"Dashboard rendered — balances shown",    desc:"The aggregated account list — balances, account numbers, product types, recent transactions — is returned to the app and displayed to the customer.",                                                                                                                       tag:"UI Rendered",        lsScreen:3 },
+      { from:"accounts", to:"audit",    title:"Authentication & data access logged",    desc:"The authentication event and data access are written to the Audit log. Required for PSD2 SCA compliance and GDPR data access auditing.",                                                                                                                                   tag:"Audit · PSD2 · GDPR",lsScreen:3 }
+    ]
+  },
+  payment: {
+    title: "Payment with Approval",
+    desc:  "Maker logs in · creates & signs payment · Approver logs in · reviews & signs · Core Banking executes.",
+    steps: [
+      // ── MAKER PHASE ──────────────────────────────────────────────────────
+      { from:"app",      to:"auth",      title:"Maker opens app — login initiated",                 desc:"Jane Head opens the Digital Banking app. Tap 'Login as Maker' to begin the OIDC auth flow against Auth Server.", tag:"Login Gate",        pmScreen:"pm-a", waitUser:true, mmHint:"👆 Tap Login as Maker", noArrow:true },
+      { from:"app",      to:"edge",      title:"Login request enters Edge",                         desc:"Every request enters Edge first — the single ingress point. Edge routes the OIDC authorization request toward the Auth Server.", tag:"HTTPS · Edge",      pmScreen:"pm-0" },
+      { from:"edge",     to:"discovery", title:"Edge resolves Auth Server via Service Registry",     desc:"Edge consults the Service Registry to locate the correct Auth Server instance and apply load balancing before forwarding the request.", tag:"Service Discovery", pmScreen:"pm-0" },
+      { from:"app",      to:"auth",      title:"Maker biometric authentication",                    desc:"Edge forwards the OIDC request to the Auth Server. On a registered device, FIDO UAF Touch ID is offered. Auth Server coordinates with FIDO Service and Device Management.", tag:"OIDC · Login",      pmScreen:"pm-1" },
+      { from:"auth",     to:"fraud",     title:"FIDO challenge — biometric verified",               desc:"FIDO Service issues a UAF challenge. The device Secure Enclave signs it. Fraud Detection scores the device risk. Auth Server validates the signature and completes login.", tag:"FIDO · SCA",        pmScreen:"pm-1" },
+      { from:"token",    to:"access",    title:"Role & entitlement check",                          desc:"Edge converts the external JWT to internal. Access Control evaluates the maker's role — confirms payment initiation rights, arrangement-level access, and applicable payment limits.", tag:"RBAC · Limits",     pmScreen:"pm-2" },
+      { from:"access",   to:"payments",  title:"Maker submits payment",                             desc:"Maker fills in the payment form: Dorothy Ellis · EUR 42,61 · International. Tapping Submit sends POST /payments to Banking Services. The payment is validated and stored with status 'Entered'.", tag:"POST /payments",    pmScreen:"pm-3", waitUser:true, mmHint:"👆 Tap Submit Payment" },
+      { from:"payments", to:"limits",    title:"Limits check — payment within threshold",           desc:"Before triggering Transaction Signing, Banking Services calls the Limits service to verify the payment amount is within the Maker's configured per-transaction and daily limits. If the limit is exceeded the payment is rejected here.", tag:"Limits Check",      pmScreen:"pm-4" },
+      { from:"payments", to:"txsigning", title:"Maker signs payment — Face ID (SCA)",               desc:"Limits passed. The FIDO Service sends a cryptographic challenge bound to this specific payment. Maker authenticates with Face ID — the Secure Enclave signs the payload. Required by PSD2 SCA.", tag:"SCA · Face ID",     pmScreen:"pm-4", waitUser:true, mmHint:"👆 Authenticate with Face ID" },
+      { from:"txsigning",to:"approvals", title:"Signed payment enters approval queue",              desc:"Auth Server validates the Maker's cryptographic signature. Banking Services stores the payment with status 'Entered'. Approvals service evaluates the policy — amount threshold requires 1 authorised approver. A pending task is created.", tag:"Approval Policy",   pmScreen:"pm-5" },
+      { from:"approvals",to:"messaging", title:"Approver notified — Maker signs out",               desc:"Message Delivery sends a push notification to the Approver. The Maker's session ends — tap Sign Out to hand off to the Approver.", tag:"Push · Sign Out",   pmScreen:"pm-5", waitUser:true, mmHint:"👆 Sign Out" },
+      // ── APPROVER PHASE ───────────────────────────────────────────────────
+      { from:"app",      to:"auth",      title:"Approver opens app — login initiated",              desc:"Kristel Jewel opens the app on her own device. Tap 'Login as Approver' to begin a fresh OIDC session with Approver role claims.", tag:"Login Gate",        pmScreen:"pm-b", waitUser:true, mmHint:"👆 Tap Login as Approver", noArrow:true },
+      { from:"app",      to:"edge",      title:"Approver login request enters Edge",                desc:"The Approver's login request enters Edge — a completely separate OIDC session from the Maker's. Edge routes toward the Auth Server.", tag:"HTTPS · Edge",      pmScreen:"pm-6" },
+      { from:"edge",     to:"discovery", title:"Edge resolves Auth Server via Service Registry",     desc:"Edge again consults the Service Registry to locate the Auth Server instance for the Approver's fresh authentication session.", tag:"Service Discovery", pmScreen:"pm-6" },
+      { from:"app",      to:"auth",      title:"Approver biometric authentication",                 desc:"Edge forwards the OIDC request. Auth Server verifies Kristel's identity via FIDO UAF biometric and issues her external JWT containing Approver role claims.", tag:"Approver Login",    pmScreen:"pm-7" },
+      { from:"auth",     to:"fraud",     title:"Approver device & risk scoring",                    desc:"Device Management verifies the Approver's device is registered and trusted. Fraud Detection re-evaluates device fingerprint and risk score for this new session.", tag:"FIDO · Risk",       pmScreen:"pm-7" },
+      { from:"token",    to:"access",    title:"Approver auth + role check",                        desc:"Edge converts Approver's external JWT to internal. Access Control confirms the 'Authorised Approver' role and rights to act on this specific payment arrangement.", tag:"Approver RBAC",     pmScreen:"pm-7" },
+      { from:"access",   to:"approvals", title:"Pending payment displayed to approver",             desc:"Approvals service returns the pending payment details: counterparty, amount, creator, SCA confirmation. Approve and Reject buttons are active for this user.", tag:"Pending Review",    pmScreen:"pm-8", waitUser:true, mmHint:"👆 Tap Approve" },
+      { from:"approvals",to:"limits",    title:"Limits check — approval within threshold",          desc:"Before triggering Transaction Signing, Banking Services calls the Limits service to verify the approval action is within the Approver's configured authorisation limits for this payment arrangement.", tag:"Limits Check",      pmScreen:"pm-9" },
+      { from:"approvals",to:"txsigning", title:"Approver signs payment — Face ID (SCA)",            desc:"Limits passed. The FIDO challenge is cryptographically bound to this payment. Approver authenticates with Face ID — protects against man-in-the-browser attacks. Required by PSD2.", tag:"SCA · Face ID",     pmScreen:"pm-9", waitUser:true, mmHint:"👆 Authenticate with Face ID" },
+      { from:"txsigning",to:"outbound",  title:"Verified signature → Core Banking",                 desc:"Auth Server validates the Approver's cryptographic signature. Approvals marks the payment approved. The Outbound Client SDK Connector translates the payment to Core Banking's API format and submits it.", tag:"Client SDK",        pmScreen:"pm-10" },
+      { from:"outbound", to:"core",      title:"Core Banking executes payment",                     desc:"Core Banking debits Checking USD 8102, applies value dating, and routes the instruction to the Payment Hub connector.", tag:"Ledger Debit",      pmScreen:"pm-10" },
+      { from:"core",     to:"networks",  title:"Core Banking → Payment Hub",                        desc:"Core Banking submits the payment instruction to the Payment Hub. The hub routes it to the SWIFT/SEPA/ACH rail for clearing and settlement.", tag:"Payment Hub",       pmScreen:"pm-10" },
+      { from:"core",     to:"payments",  title:"Settlement confirmed → Payments service",           desc:"Core Banking (via the Inbound Service SDK connector) relays the settlement confirmation back to the Payments Banking Service. The payment record is updated to 'Processed'.", tag:"Status Sync",       pmScreen:"pm-11" },
+      { from:"payments", to:"audit",     title:"Full audit trail recorded",                         desc:"Every event — creation, Maker SCA, limits checks, approval, Approver SCA, Core Banking execution, hub settlement — is written to Audit.", tag:"Audit · PSD2",      pmScreen:"pm-11" },
+      { from:"payments", to:"app",       title:"Payment status pushed to app",                      desc:"Banking Services pushes the updated payment status (Processed) back to the app. The payment list refreshes.", tag:"Status Update",     pmScreen:"pm-11" },
+      { from:"payments", to:"messaging", title:"Push notification delivered",                       desc:"Message Delivery sends push notifications to both the Maker and Approver confirming the payment was processed and settled.", tag:"Push · Success",    pmScreen:"pm-11" }
+    ]
+  },
+};
+
+// ── State ─────────────────────────────────────────────────────────────────
+let curSc = 'login', curStep = -1, playing = false, paused = false, timer = null, spd = 1;
+
+// ── DOM ───────────────────────────────────────────────────────────────────
+const animPaths  = document.getElementById('anim-paths');
+const stepsList  = document.getElementById('steps-list');
+const btnPlay    = document.getElementById('btn-play');
+const btnReset   = document.getElementById('btn-reset');
+const infoPopup  = document.getElementById('info-popup');
+const infoTitle  = document.getElementById('info-title');
+const infoDesc   = document.getElementById('info-desc');
+const infoClose  = document.getElementById('info-close');
+const speedEl    = document.getElementById('speed');
+const speedLbl   = document.getElementById('speed-lbl');
+const scTitle    = document.getElementById('sc-title');
+const scDesc     = document.getElementById('sc-desc');
+
+// ── Utilities ─────────────────────────────────────────────────────────────
+function clearPaths() { while(animPaths.firstChild) animPaths.removeChild(animPaths.firstChild); }
+
+function nodeEl(id) {
+  return document.getElementById('node-' + id) || document.getElementById('node-' + id + '2');
+}
+
+function dimAllNodes() {
+  document.querySelectorAll('.node').forEach(n => { n.classList.add('dim'); n.classList.remove('hi'); });
+}
+function clearAllNodes() {
+  document.querySelectorAll('.node').forEach(n => { n.classList.remove('dim','hi'); });
+}
+function hiNode(id, on) {
+  const el = nodeEl(id);
+  if (!el) return;
+  if (on) { el.classList.add('hi'); el.classList.remove('dim'); }
+  else      el.classList.remove('hi');
+}
+
+// Draw a gently curved animated connector
+// Returns the path element so caller can manage it
+function drawAnimPath(fromId, toId, color='#00AEEF', fadeIn=true) {
+  const A = POS[fromId], B = POS[toId];
+  if (!A || !B) return null;
+  const mx = (A.x+B.x)/2, my = (A.y+B.y)/2 - 18;
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d', `M${A.x},${A.y} Q${mx},${my} ${B.x},${B.y}`);
+  path.setAttribute('stroke', color);
+  path.setAttribute('stroke-width','2');
+  path.setAttribute('fill','none');
+  path.setAttribute('opacity', fadeIn ? '0' : '0.5');
+  path.setAttribute('marker-end','url(#arr-cyan)');
+  path.dataset.persistent = '1';
+  animPaths.appendChild(path);
+  if (fadeIn) {
+    // fade in quickly
+    let op = 0;
+    const fade = () => { op = Math.min(op + 0.1, 0.55); path.setAttribute('opacity', op); if (op < 0.55) requestAnimationFrame(fade); };
+    requestAnimationFrame(fade);
+  }
+  return path;
+}
+
+// Animate a dot along a bezier from fromId to toId
+function animPacket(fromId, toId, color, dur, done) {
+  const A = POS[fromId], B = POS[toId];
+  if (!A || !B) { done && done(); return; }
+  const mx = (A.x+B.x)/2, my = (A.y+B.y)/2 - 18;
+  const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  dot.setAttribute('r','7');
+  dot.setAttribute('fill', color);
+  dot.setAttribute('filter','url(#glow)');
+  animPaths.appendChild(dot);
+
+  // Trail
+  const trail = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  trail.setAttribute('r','4');
+  trail.setAttribute('fill', color);
+  trail.setAttribute('opacity','.35');
+  animPaths.appendChild(trail);
+
+  let t0 = null;
+  function step(ts) {
+    if (!t0) t0 = ts;
+    const t = Math.min((ts - t0) / dur, 1);
+    const ease = t < .5 ? 2*t*t : -1+(4-2*t)*t; // ease-in-out
+    const cx = (1-ease)*(1-ease)*A.x + 2*(1-ease)*ease*mx + ease*ease*B.x;
+    const cy = (1-ease)*(1-ease)*A.y + 2*(1-ease)*ease*my + ease*ease*B.y;
+    dot.setAttribute('cx',cx); dot.setAttribute('cy',cy);
+    // trail slightly behind
+    const t2 = Math.max(0, ease - .08);
+    const cx2 = (1-t2)*(1-t2)*A.x + 2*(1-t2)*t2*mx + t2*t2*B.x;
+    const cy2 = (1-t2)*(1-t2)*A.y + 2*(1-t2)*t2*my + t2*t2*B.y;
+    trail.setAttribute('cx',cx2); trail.setAttribute('cy',cy2);
+    if (t < 1) requestAnimationFrame(step);
+    else { dot.remove(); trail.remove(); done && done(); }
+  }
+  requestAnimationFrame(step);
+}
+
+// ── Step rendering ────────────────────────────────────────────────────────
+function renderSteps() {
+  const sc = SCENARIOS[curSc];
+  stepsList.innerHTML = '';
+  sc.steps.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'step';
+    div.dataset.i = i;
+    div.title = 'Click to replay this step';
+    div.innerHTML = `
+      <div class="snum">${i+1}</div>
+      <div class="step-body">
+        <h4>${s.title}</h4>
+        <p>${s.desc}</p>
+        <span class="step-tag">${s.tag}</span>
+      </div>`;
+    div.addEventListener('click', () => {
+      if (div.classList.contains('done') || div.classList.contains('active')) {
+        jumpToStep(i);
+      }
+    });
+    stepsList.appendChild(div);
+  });
+}
+
+function updateSteps(idx) {
+  stepsList.querySelectorAll('.step').forEach((el,i) => {
+    el.classList.remove('active','done');
+    if (i < idx) el.classList.add('done');
+    else if (i === idx) { el.classList.add('active'); el.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+  });
+}
+
+// ── Play engine ───────────────────────────────────────────────────────────
+let waitingForUser = false;
+
+function playStep(idx) {
+  const sc = SCENARIOS[curSc];
+  if (idx >= sc.steps.length) {
+    playing = false;
+    btnPlay.textContent = '↺ Replay';
+    btnPlay.disabled = false;
+    clearAllNodes();
+    // Show final mock screen
+    if (curSc === 'payment') showMmScreen('pm-11');
+    if (curSc === 'login')   showLsScreen(3);
+    return;
+  }
+  curStep = idx;
+  updateSteps(idx);
+  const s = sc.steps[idx];
+
+  // Update mobile mock screen if specified
+  if (s.lsScreen !== undefined)  showLsScreen(s.lsScreen);
+  else if (s.pmScreen !== undefined) showMmScreen(s.pmScreen);
+
+  // noArrow steps (login gates): no node highlight, no arrow, just wait
+  if (s.noArrow) {
+    clearAllNodes();
+    if (s.waitUser) {
+      waitingForUser = true;
+      btnPlay.textContent = '👆 Waiting…';
+      btnPlay.disabled = true;
+      const hintEl = document.getElementById('user-hint');
+      if (hintEl) { hintEl.textContent = s.mmHint || ''; hintEl.style.display = s.mmHint ? 'block' : 'none'; }
+    } else {
+      timer = setTimeout(() => playStep(idx+1), 300/spd);
+    }
+    return;
+  }
+
+  // Dim all nodes, then highlight just the active pair
+  dimAllNodes();
+  hiNode(s.from, true); hiNode(s.to, true);
+
+  // Fade existing persistent paths to dim trail
+  animPaths.querySelectorAll('path[data-persistent]').forEach(p => {
+    p.setAttribute('opacity','0.18');
+    p.setAttribute('stroke-width','1.5');
+    p.removeAttribute('marker-end');
+  });
+
+  // Draw active path
+  drawAnimPath(s.from, s.to, '#00AEEF', false);
+  const activePath = animPaths.querySelector('path[data-persistent]:last-child');
+  if (activePath) { activePath.setAttribute('opacity','0.85'); activePath.setAttribute('stroke-width','2.5'); activePath.setAttribute('marker-end','url(#arr-cyan)'); }
+
+  // If step requires user interaction, pause and wait
+  if (s.waitUser) {
+    waitingForUser = true;
+    btnPlay.textContent = '👆 Waiting…';
+    btnPlay.disabled = true;
+    // Update sidebar hint
+    const hintEl = document.getElementById('user-hint');
+    if (hintEl) { hintEl.textContent = s.mmHint || ''; hintEl.style.display = s.mmHint ? 'block' : 'none'; }
+    // Packet still animates to show the request going
+    animPacket(s.from, s.to, '#FFD700', 800/spd, null);
+    return; // wait — resumed by mmContinue()
+  }
+
+  animPacket(s.from, s.to, '#FFD700', 800/spd, () => {
+    timer = setTimeout(() => playStep(idx+1), 500/spd);
+  });
+}
+
+// ── Jump to any step (click replay) ──────────────────────────────────────
+function jumpToStep(idx) {
+  // Stop any running playback
+  clearTimeout(timer);
+  playing = true;
+  waitingForUser = false;
+  btnPlay.textContent = '⏸ Running…';
+  btnPlay.disabled = true;
+
+  const sc = SCENARIOS[curSc];
+  clearPaths();
+  clearAllNodes();
+
+  // Replay all steps before idx as instant dim trails (no animation)
+  for (let i = 0; i < idx; i++) {
+    const ps = sc.steps[i];
+    if (ps.noArrow) continue;  // login gates have no arrow to draw
+    drawAnimPath(ps.from, ps.to, '#00AEEF', false);
+    // dim it immediately
+    const p = animPaths.querySelector('path[data-persistent]:last-child');
+    if (p) { p.setAttribute('opacity','0.12'); p.setAttribute('stroke-width','1'); p.removeAttribute('marker-end'); }
+  }
+
+  // Restore mock screen to the one for this step
+  const s = sc.steps[idx];
+  if (s.lsScreen !== undefined)      showLsScreen(s.lsScreen);
+  else if (s.pmScreen !== undefined)  showMmScreen(s.pmScreen);
+
+  // Re-sync step list UI
+  curStep = idx;
+  updateSteps(idx);
+
+  // Clear hint
+  const hintEl = document.getElementById('user-hint');
+  if (hintEl) hintEl.style.display = 'none';
+
+  // noArrow steps: no visual, just set up wait/pause state
+  if (s.noArrow) {
+    clearAllNodes();
+    if (s.waitUser) {
+      ['mm-maker-login-btn','mm-submit-btn','mm-maker-sign-btn','mm-signout-btn',
+       'mm-appr-login-btn','mm-approve-btn','mm-sign-btn'].forEach(id => {
+        document.getElementById(id)?.classList.add('mm-pulse');
+      });
+      waitingForUser = true;
+      btnPlay.textContent = '👆 Waiting…';
+      btnPlay.disabled = true;
+      if (hintEl) { hintEl.textContent = s.mmHint || ''; hintEl.style.display = s.mmHint ? 'block' : 'none'; }
+    } else {
+      playing = false; paused = true;
+      btnPlay.textContent = '▶ Continue';
+      btnPlay.disabled = false;
+    }
+    return;
+  }
+
+  // Now play just this step's packet, then pause
+  dimAllNodes();
+  hiNode(s.from, true); hiNode(s.to, true);
+
+  // Draw active path on top
+  drawAnimPath(s.from, s.to, '#00AEEF', false);
+  const activePath = animPaths.querySelector('path[data-persistent]:last-child');
+  if (activePath) { activePath.setAttribute('opacity','0.85'); activePath.setAttribute('stroke-width','2.5'); activePath.setAttribute('marker-end','url(#arr-cyan)'); }
+
+  if (s.waitUser) {
+    // Restore pulse on whichever button this step expects
+    ['mm-maker-login-btn','mm-submit-btn','mm-maker-sign-btn','mm-signout-btn',
+     'mm-appr-login-btn','mm-approve-btn','mm-sign-btn'].forEach(id => {
+      document.getElementById(id)?.classList.add('mm-pulse');
+    });
+    // This step needs user input — set up the wait state
+    waitingForUser = true;
+    btnPlay.textContent = '👆 Waiting…';
+    btnPlay.disabled = true;
+    if (hintEl) { hintEl.textContent = s.mmHint || ''; hintEl.style.display = s.mmHint ? 'block' : 'none'; }
+    animPacket(s.from, s.to, '#FFD700', 800/spd, null);
+  } else {
+    // Animate packet then pause (don't auto-advance — let user click next step or Play)
+    animPacket(s.from, s.to, '#FFD700', 800/spd, () => {
+      playing = false;
+      paused = true;
+      btnPlay.textContent = '▶ Continue';
+      btnPlay.disabled = false;
+    });
+  }
+}
+
+// Called when user taps a mobile UI element to advance
+function mmContinue() {
+  if (!waitingForUser) return;
+  waitingForUser = false;
+  btnPlay.textContent = '⏸ Running…';
+  btnPlay.disabled = true;
+  const hintEl = document.getElementById('user-hint');
+  if (hintEl) hintEl.style.display = 'none';
+  timer = setTimeout(() => playStep(curStep + 1), 300/spd);
+}
+
+function startPlay() {
+  if (playing) return;
+  playing = true;
+  paused = false;
+  btnPlay.textContent = '⏸ Running…';
+  btnPlay.disabled = true;
+  // If paused mid-journey (after jumpToStep), continue from next step
+  if (paused && curStep >= 0 && curStep < SCENARIOS[curSc].steps.length - 1) {
+    paused = false;
+    playStep(curStep + 1);
+    return;
+  }
+  // Fresh start
+  paused = false;
+  clearPaths(); clearAllNodes(); curStep = -1;
+  playStep(0);
+}
+
+function reset() {
+  clearTimeout(timer);
+  playing = false; paused = false; curStep = -1; waitingForUser = false;
+  clearPaths(); clearAllNodes();
+  btnPlay.textContent = '▶ Play';
+  btnPlay.disabled = false;
+  stepsList.querySelectorAll('.step').forEach(el => el.classList.remove('active','done'));
+  const hintEl = document.getElementById('user-hint');
+  if (hintEl) hintEl.style.display = 'none';
+  // Reset passcode dots
+  pcCount = 0;
+  [0,1,2,3,4].forEach(i => { const d = document.getElementById('d'+i); if(d) d.classList.remove('filled'); });
+  // Reset interactive elements
+  ['mm-maker-login-btn','mm-submit-btn','mm-maker-sign-btn','mm-signout-btn',
+   'mm-appr-login-btn','mm-approve-btn','mm-sign-btn'].forEach(id => {
+    document.getElementById(id)?.classList.add('mm-pulse');
+  });
+  // Reset progress bars and notification
+  const lb  = document.getElementById('login-bar');     if(lb)  lb.style.width='0%';
+  const plb = document.getElementById('pay-login-bar'); if(plb) plb.style.width='0%';
+  const ab  = document.getElementById('appr-bar');  if(ab)  ab.style.width='0%';
+  const pb  = document.getElementById('proc-bar');  if(pb)  pb.style.width='0%';
+  const nt  = document.getElementById('mm-notif');  if(nt)  nt.style.opacity='0';
+  if (curSc === 'payment') { showMmScreen('pm-a'); }
+  if (curSc === 'login')   { showLsScreen(0); const lb = document.getElementById('login-bar'); if(lb) lb.style.width='0%'; }
+}
+
+// ── Scenario switch ───────────────────────────────────────────────────────
+function loadScenario(id) {
+  curSc = id; reset();
+  const sc = SCENARIOS[id];
+  scTitle.textContent = sc.title;
+  scDesc.textContent  = sc.desc;
+  renderSteps();
+  // Show/hide mobile mock
+  if (id === 'payment' || id === 'login') initMobileMock();
+  else hideMobileMock();
+}
+
+document.querySelectorAll('.sc-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sc-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadScenario(btn.dataset.sc);
+  });
+});
+
+// ── Controls ──────────────────────────────────────────────────────────────
+btnPlay.addEventListener('click', () => {
+  if (btnPlay.textContent.includes('Replay')) { reset(); setTimeout(startPlay, 30); return; }
+  startPlay();
+});
+btnReset.addEventListener('click', reset);
+
+speedEl.addEventListener('input', () => {
+  spd = parseFloat(speedEl.value);
+  speedLbl.textContent = spd + '×';
+});
+
+// ── Node hover → rich HTML tooltip (title + full description) ────────────
+const TOOLTIP_OFFSET_X = 14, TOOLTIP_OFFSET_Y = -12;
+const TOOLTIP_W = 300;
+
+function positionTooltip(e) {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let x = e.clientX + TOOLTIP_OFFSET_X;
+  let y = e.clientY + TOOLTIP_OFFSET_Y;
+  // Clamp right edge
+  if (x + TOOLTIP_W + 10 > vw) x = e.clientX - TOOLTIP_W - TOOLTIP_OFFSET_X;
+  // Clamp bottom edge — approximate tooltip height ~120px
+  if (y + 130 > vh) y = e.clientY - 130;
+  if (y < 8) y = 8;
+  infoPopup.style.left = x + 'px';
+  infoPopup.style.top  = y + 'px';
+}
+
+document.querySelectorAll('.node').forEach(node => {
+  node.addEventListener('mouseenter', e => {
+    const id = node.dataset.id;
+    const c  = COMPS[id];
+    if (!c) return;
+    infoTitle.textContent = c.title;
+    infoDesc.textContent  = c.desc;
+    positionTooltip(e);
+    infoPopup.classList.add('show');
+  });
+  node.addEventListener('mousemove', e => {
+    if (infoPopup.classList.contains('show')) positionTooltip(e);
+  });
+  node.addEventListener('mouseleave', () => {
+    infoPopup.classList.remove('show');
+  });
+});
+
+// banking overlay JS removed
+
+// ── Mobile Mock ────────────────────────────────────────────────────────────
+const mobileMock   = document.getElementById('mobile-mock');
+const sbMockZone   = document.getElementById('sb-mock-zone');
+
+// Show a screen by element ID
+function showMmScreenById(id) {
+  document.querySelectorAll('.mm-screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+// For login scenario — show ls screen
+function showLsScreen(n) {
+  showMmScreenById('mm-ls' + n);
+  if (n === 0) { setTimeout(() => { const b = document.getElementById('login-bar'); if(b) b.style.width='100%'; }, 100); }
+}
+
+// For payment scenario — show pm screen by suffix
+function showMmScreen(suffix) {
+  showMmScreenById('mm-' + suffix);
+  if (suffix === 'pm-0')  { setTimeout(() => { const b = document.getElementById('pay-login-bar'); if(b) b.style.width='100%'; }, 100); }
+  if (suffix === 'pm-6')  { setTimeout(() => { const b = document.getElementById('appr-bar');      if(b) b.style.width='100%'; }, 100); }
+  if (suffix === 'pm-10') { setTimeout(() => { const b = document.getElementById('proc-bar');      if(b) b.style.width='100%'; }, 100); }
+  if (suffix === 'pm-11') { setTimeout(() => { const nt = document.getElementById('mm-notif');     if(nt) nt.style.opacity='1'; }, 500); }
+}
+
+function initMobileMock() {
+  sbMockZone.classList.remove('no-mock');
+  sbMockZone.classList.add('has-mock');
+  mobileMock.classList.add('visible');
+  if (curSc === 'login') showLsScreen(0);
+  else showMmScreen('pm-a');
+}
+function hideMobileMock() {
+  sbMockZone.classList.add('no-mock');
+  sbMockZone.classList.remove('has-mock');
+  mobileMock.classList.remove('visible');
+}
+
+// Helper: wire any button to advance when waiting
+function wireBtn(id, condition) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('click', () => {
+    if (!condition()) return;
+    el.classList.remove('mm-pulse');
+    mmContinue();
+  });
+}
+
+// Maker Login gate
+wireBtn('mm-maker-login-btn', () => curSc === 'payment' && waitingForUser);
+// Maker submit payment
+wireBtn('mm-submit-btn', () => curSc === 'payment' && waitingForUser);
+// Maker Face ID transaction signing
+wireBtn('mm-maker-sign-btn', () => curSc === 'payment' && waitingForUser);
+// Maker sign out (pending screen)
+wireBtn('mm-signout-btn', () => curSc === 'payment' && waitingForUser);
+// Approver Login gate
+wireBtn('mm-appr-login-btn', () => curSc === 'payment' && waitingForUser);
+// Approver tap Approve
+wireBtn('mm-approve-btn', () => curSc === 'payment' && waitingForUser);
+// Approver Face ID transaction signing
+wireBtn('mm-sign-btn', () => curSc === 'payment' && waitingForUser);
+// Done button (final screen)
+document.getElementById('mm-done-btn').addEventListener('click', () => {
+  if (curSc === 'payment') reset();
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────
+loadScenario('login');
+</script>
+</body>
+</html>
